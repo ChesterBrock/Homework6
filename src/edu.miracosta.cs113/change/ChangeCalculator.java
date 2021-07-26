@@ -1,4 +1,6 @@
 package edu.miracosta.cs113.change;
+import java.io.*;
+import java.util.ArrayList;
 
 /**
  * ChangeCalculator : Class containing the recursive method calculateChange, which determines and prints all
@@ -11,6 +13,10 @@ package edu.miracosta.cs113.change;
  * verify that all given coin combinations are unique.
  */
 public class ChangeCalculator {
+	static int[] coinValues = {25, 10, 5, 1};
+	static ArrayList<Integer> c;
+	
+	private static ArrayList<String> combos = new ArrayList<String>();
 
     /**
      * Wrapper method for determining all possible unique combinations of quarters, dimes, nickels, and pennies that
@@ -27,8 +33,52 @@ public class ChangeCalculator {
     public static int calculateChange(int cents) {
         // TODO:
         // Implement a recursive solution following the given documentation.
-
-        return -1;
+    	c = new ArrayList<Integer>();
+    	
+    	for(int i = 0; i < cents + 1; i++) {
+    		c.add(0);
+    	}
+    	
+    	c.set(0, 1);
+    	
+    	for(int j = 0; j < cents + 1; j++) {
+    		for(int j = 0; j < cents + 1; j++) {
+    			if(coinValues[i] <= j) {
+    				c.set(j, c.get(j) + c.get(j - coinValues[i]));
+    			}
+    		}
+    	}
+        makeChange(cents,0,0,0, cents);
+        
+        for(String string : combos) {
+        	Ststem.out.println(string);
+        }
+        
+        return c.get(cents);
+    }
+    
+    private static void makeChange(int total, int nQuarter, int nDime, int nNickel, int nPenny) {
+    	final int QUARTER = coinValues[0], DIME = coinVaues[1], NICKEL = coinValues[2], PENNY = coinValues[3];
+    	
+    	if(nQuarter * QUARTER + nDime * DIME + nNickel * NICKEL + nPenny * PENNY > total) {
+    		return;
+    	}
+    	
+    	// String combonation 
+    	String combination = "[" + nQuarter + ", " + nDime + ", " + nNickel + ", " + nPenny + "]";
+    	
+    	if(!combos.contains(combination))combos.add(combination);
+    	
+    	// cases
+    	if (nPenny >= 5)
+    		makeChange(total, nQuarter, nDime, nNickel + 1, nPenny - 5);
+    	
+    	if (nPenny >= 10)
+    		makeChange(total, nQuarter, nDime + 1, nNickel, nPenny - 10);
+    	
+    	if (nPenny >= 25)
+    		makeChange(total, nQuarter + 1, nDime, nNickel, nPenny - 25);
+    		
     }
 
     /**
@@ -43,6 +93,17 @@ public class ChangeCalculator {
     public static void printCombinationsToFile(int cents) {
         // TODO:
         // This when calculateChange is complete. Note that the text file must be created within this directory.
+    	File file = new File("C:\\A.txt");
+        FileWriter writer;
+        try {
+            writer = new FileWriter(file, true);
+            PrintWriter printer = new PrintWriter(writer);
+            printer.append(combos);
+            printer.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 } // End of class ChangeCalculator
